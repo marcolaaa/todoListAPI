@@ -1,9 +1,15 @@
-var express = require('express'),
-  app = express(),
-  port = process.env.PORT || 3000,
-  mongoose = require('mongoose'),
-  Task = require('./api/models/todoListModel'), //created model loading here
-  bodyParser = require('body-parser');
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000;
+const mongoose = require('mongoose');
+
+//created models loading here
+const Task = require('./api/models/todoListModel');
+const User = require('./api/models/userModel');
+
+const bodyParser = require('body-parser');
+const jwt = require('./_helpers/jwt');
+const errorHandler = require('./_helpers/error-handler');
 
 //dotenv to get the variables in your .env file.  
 require('dotenv').config();  
@@ -11,7 +17,7 @@ require('dotenv').config();
 //mongoose instance connection url connection
 mongoose.Promise = global.Promise;
 //mongoose.connect('mongodb://localhost/Tododb'); 
-var myMongoKey = process.env.MYMONGODBKEY;
+const myMongoKey = process.env.MYMONGODBKEY;
 mongoose.connect('mongodb+srv://marcola:' + myMongoKey + '@todolistapi-unget.mongodb.net/todolistAPI?retryWrites=true&w=majority',{
     useUnifiedTopology: true,
     useNewUrlParser: true
@@ -21,16 +27,20 @@ mongoose.connect('mongodb+srv://marcola:' + myMongoKey + '@todolistapi-unget.mon
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+//importing routes
+const todoListRoutes = require('./api/routes/todoListRoutes'); 
+const userRoutes = require('./api/routes/userRoutes');
 
-var routes = require('./api/routes/todoListRoutes'); //importing route
-routes(app); //register the route
+//register the routes
+todoListRoutes(app);
+userRoutes(app);
 
-app.use(function(req, res) {
-  res.status(404).send({url: req.originalUrl + ' not found'})
+// use JWT auth to secure the api
+app.use(jwt());
+
+// global error handler
+app.use(errorHandler);
+
+app.listen(port, function () {
+  console.log('Server listening on port ' + port);
 });
-
-
-app.listen(port);
-
-
-console.log('todo list RESTful API server started on: ' + port);

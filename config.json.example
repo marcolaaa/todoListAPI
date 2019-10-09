@@ -1,0 +1,3 @@
+{
+    "secret": "<YOUR KEY FOR THE JWT TOKEN>"
+}

@@ -1,48 +1,35 @@
 'use strict';
-var mongoose = require('mongoose'),
-  Task = mongoose.model('Tasks');
+const todoListService = require('../services/todoListService');
 
 exports.list_all_tasks = function(req, res) {
-  Task.find({}, function(err, task) {
-    if (err)
-      res.send(err);
-    res.json(task);
-  });
+  todoListService.list_all_tasks()
+      .then(tasks => res.json(tasks))
+      .catch(err => next(err));
 };
 
-
-exports.create_a_task = function(req, res) {
-  var new_task = new Task(req.body);
-  new_task.save(function(err, task) {
-    if (err)
-      res.send(err);
-    res.json(task);
-  });
-};
+exports.create_a_task = function(req, res, next) {
+  todoListService.create_a_task(req.body)
+      .then(task => res.json(task))
+      .catch(err => next(err));
+}
 
 
 exports.read_a_task = function(req, res) {
-  Task.findById(req.params.taskId, function(err, task) {
-    if (err)
-      res.send(err);
-    res.json(task);
-  });
+  todoListService.read_a_task(req.params.taskId)
+      .then(task => res.json(task))
+      .catch(err => next(err));
 };
 
 
 exports.update_a_task = function(req, res) {
-  Task.findOneAndUpdate({_id: req.params.taskId}, req.body, {new: true}, function(err, task) {
-    if (err)
-      res.send(err);
-    res.json(task);
-  });
+  todoListService.update_a_task(req.params.taskId, req.body)
+      .then(task => res.json(task))
+      .catch(err => next(err));
 };
 
 
 exports.delete_a_task = function(req, res) {
-  Task.remove({_id: req.params.taskId}, function(err, task) {
-    if (err)
-      res.send(err);
-    res.json({ message: 'Task successfully deleted' });
-  });
+  todoListService.remove(req.params.taskId)
+      .then(() => res.json({ message: 'Task successfully deleted' }))
+      .catch(err => next(err));
 };
