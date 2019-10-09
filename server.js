@@ -27,6 +27,9 @@ mongoose.connect('mongodb+srv://marcola:' + myMongoKey + '@todolistapi-unget.mon
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+// use JWT auth to secure the api
+app.use(jwt());
+
 //importing routes
 const todoListRoutes = require('./api/routes/todoListRoutes'); 
 const userRoutes = require('./api/routes/userRoutes');
@@ -34,9 +37,6 @@ const userRoutes = require('./api/routes/userRoutes');
 //register the routes
 todoListRoutes(app);
 userRoutes(app);
-
-// use JWT auth to secure the api
-app.use(jwt());
 
 // global error handler
 app.use(errorHandler);
